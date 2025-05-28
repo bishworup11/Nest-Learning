@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import axios from 'axios';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -127,5 +128,37 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async appscodeLogin() {
+    // eslint-disable-next-line no-useless-catch
+    try {
+      const response = await axios.post(
+        'http://bb.test:3003/accounts/user/login',
+        {
+          username: 'appscode',
+          password: 'password',
+        },
+        {
+          headers: { 'Content-Type': 'application/json' },
+          maxRedirects: 0,
+          withCredentials: true,
+          validateStatus: (status) => status >= 200 && status < 400,
+        },
+      );
+
+      // console.log('hello');
+
+      // // This should be an array of cookie strings
+      const cookies = response.headers['set-cookie'];
+      // console.log('Cookies:', cookies);
+
+      return {
+        cookies,
+      };
+    } catch (error) {
+      console.error('Error logging into Appscode:', error);
+      // throw error;
+    }
   }
 }
